@@ -484,6 +484,9 @@ class GithubTracker {
 
     handleSort(criteria) {
         if (criteria === 'stars') this.filteredRepos.sort((a, b) => b.stargazers_count - a.stargazers_count);
+        else if (criteria === 'forks') this.filteredRepos.sort((a, b) => b.forks_count - a.forks_count);
+        else if (criteria === 'issues') this.filteredRepos.sort((a, b) => b.open_issues_count - a.open_issues_count);
+        else if (criteria === 'downloads') this.filteredRepos.sort((a, b) => (b.total_downloads || 0) - (a.total_downloads || 0));
         else if (criteria === 'updated') this.filteredRepos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
         else if (criteria === 'name') this.filteredRepos.sort((a, b) => a.name.localeCompare(b.name));
         this.renderRepos();

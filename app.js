@@ -1,5 +1,5 @@
 /**
- * BTC Studio - GitHub Overview Logic v1.3.0
+ * BTC Studio - GitHub Overview Logic v1.4.1
  * Optimized for performance and stability.
  */
 
@@ -24,10 +24,8 @@ class GithubTracker {
     init() {
         this.setupEventListeners();
         
-        // Load from cache first for instant feedback
         if (this.loadCache()) {
             this.renderUI();
-            // Refresh if older than 1 hour
             if (Date.now() - this.lastUpdated > 3600000) {
                 this.fetchData();
             }
@@ -98,7 +96,7 @@ class GithubTracker {
             this.filteredRepos = [...this.repos];
             this.lastUpdated = Date.now();
             
-            this.calculateGlobalStats();
+            await this.calculateGlobalStats();
             this.saveCache();
             this.renderUI();
             this.hideLoading();
@@ -135,11 +133,11 @@ class GithubTracker {
         }
     }
 
-    calculateGlobalStats() {
+    async calculateGlobalStats() {
         this.globalStats.stars = this.repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
         this.globalStats.repos = this.repos.length;
         this.globalStats.issues = this.repos.reduce((sum, repo) => sum + repo.open_issues_count, 0);
-        this.fetchGlobalDownloads();
+        await this.fetchGlobalDownloads();
     }
 
     async fetchGlobalDownloads() {
@@ -153,6 +151,7 @@ class GithubTracker {
                 this.apiFetch(`repos/${repo.full_name}/releases`).catch(() => [])
             );
             const allReleases = await Promise.all(promises);
+            
             allReleases.forEach((releases, index) => {
                 const repo = reposToFetch[index];
                 let repoDls = 0;
@@ -166,11 +165,11 @@ class GithubTracker {
                 repo.total_downloads = repoDls;
                 total += repoDls;
             });
+
             this.globalStats.downloads = total;
             const downloadsEl = document.getElementById('totalDownloads');
             if (downloadsEl) downloadsEl.textContent = this.formatNumber(total);
             this.saveCache();
-            this.renderRepos(); // Update table with new downloads data
         } catch (e) {
             console.warn('Downloads sync incomplete');
         }
@@ -329,13 +328,14 @@ class GithubTracker {
             totalStars += repo.stargazers_count;
             totalForks += repo.forks_count;
             totalIssues += repo.open_issues_count;
-            totalDownloads += (repo.total_downloads || 0);
+            const dls = repo.total_downloads || 0;
+            totalDownloads += dls;
 
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>
                     <div class="table-repo-name">${repo.name}</div>
-                    <div class="text-muted" style="font-size: 0.75rem">${repo.description || 'No description'}</div>
+                    <div class="text-muted" style="font-size: 0.75rem">${repo.description || 'No description provided'}</div>
                 </td>
                 <td>
                     <div class="lang-badge">
@@ -346,7 +346,7 @@ class GithubTracker {
                 <td class="table-stat-cell">${repo.stargazers_count}</td>
                 <td class="table-stat-cell">${repo.forks_count}</td>
                 <td class="table-stat-cell">${repo.open_issues_count}</td>
-                <td class="table-stat-cell"><strong>${this.formatNumber(repo.total_downloads || 0)}</strong></td>
+                <td class="table-stat-cell"><strong>${this.formatNumber(dls)}</strong></td>
                 <td>
                     <div class="table-sync-date">${new Date(repo.updated_at).toLocaleDateString()}</div>
                 </td>
@@ -398,8 +398,6 @@ class GithubTracker {
 
         try {
             const releases = await this.apiFetch(`repos/${repo.full_name}/releases`);
-            
-            // Render Activity Chart
             this.renderReleaseChart(releases);
 
             if (releaseBody) {
@@ -419,7 +417,7 @@ class GithubTracker {
                 }
             }
         } catch (e) {
-            console.error('Modal data fetch failed:', e);
+            console.error('Modal fetch failed:', e);
             if (releaseBody) releaseBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--accent-orange)">Failed to load releases.</td></tr>';
         }
     }
@@ -430,7 +428,7 @@ class GithubTracker {
 
         if (this.charts.repoDetail) this.charts.repoDetail.destroy();
 
-        const data = [...releases].reverse().slice(-10); // Last 10 releases
+        const data = [...releases].reverse().slice(-10);
 
         this.charts.repoDetail = new Chart(ctx, {
             type: 'bar',
@@ -494,8 +492,8 @@ class GithubTracker {
     showModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
     hideModal(id) { document.getElementById(id)?.classList.add('hidden'); }
     showLoading() { 
-        const grid = document.getElementById('repoGrid');
-        if (grid) grid.innerHTML = '<div class="skeleton-loader"></div>'.repeat(6); 
+        const grid = document.getElementById('reposTableBody');
+        if (grid) grid.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="skeleton-loader"></div></td></tr>'; 
     }
     hideLoading() {}
 

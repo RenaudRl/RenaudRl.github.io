@@ -101,8 +101,10 @@ class GithubTracker {
 
             let allRepos = [];
             let page = 1;
+            const repoEndpoint = this.token ? 'user/repos' : `users/${this.username}/repos`;
+            
             while (true) {
-                const reposPage = await this.apiFetch(`users/${this.username}/repos?per_page=100&page=${page}&sort=updated`);
+                const reposPage = await this.apiFetch(`${repoEndpoint}?per_page=100&page=${page}&sort=updated`);
                 if (!reposPage || reposPage.length === 0) break;
                 allRepos = [...allRepos, ...reposPage];
                 if (reposPage.length < 100) break;
@@ -167,7 +169,7 @@ class GithubTracker {
 
         try {
             const promises = reposToFetch.map(repo =>
-                this.apiFetch(`repos/${repo.full_name}/releases`).catch(() => [])
+                this.apiFetch(`repos/${repo.full_name}/releases?per_page=100`).catch(() => [])
             );
             const allReleases = await Promise.all(promises);
 

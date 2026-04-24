@@ -131,6 +131,8 @@ class GithubTracker {
 
         if (response.status === 403) {
             const remaining = response.headers.get('X-RateLimit-Remaining');
+            const resetTime = response.headers.get('X-RateLimit-Reset');
+            console.warn(`Rate limit status: ${remaining} remaining. Resets at ${new Date(resetTime * 1000).toLocaleTimeString()}`);
             if (remaining === '0') throw new Error('Rate limit exceeded.');
         }
         if (!response.ok) throw new Error(`GitHub API Error: ${response.status}`);
@@ -159,8 +161,8 @@ class GithubTracker {
 
     async fetchGlobalDownloads() {
         let total = 0;
-        const targetRepos = this.repos.filter(r => !r.fork && r.stargazers_count > 0);
-        const limit = this.token ? 100 : 15;
+        const targetRepos = [...this.repos].sort((a, b) => b.stargazers_count - a.stargazers_count);
+        const limit = this.token ? 100 : 40;
         const reposToFetch = targetRepos.slice(0, limit);
 
         try {

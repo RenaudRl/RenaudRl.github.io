@@ -142,8 +142,8 @@
                             <input type="text" id="repoSearch" placeholder="Filter inventory...">
                         </div>
                         <select id="sortSelect" class="nexus-select">
+                            <option value="updated" selected>Recently Updated</option>
                             <option value="stars">Most Stars</option>
-                            <option value="updated">Recently Updated</option>
                             <option value="name">Name</option>
                         </select>
                     </div>
@@ -178,7 +178,7 @@
                         <p>High-performance monitoring dashboard for TypeWriter infrastructures.</p>
                     </div>
                     <div class="footer-links">
-                        <span class="version">v1.3.0-PRO</span>
+                        <span class="version">v1.3.1-PRO</span>
                     </div>
                 </div>
             </footer>
@@ -200,6 +200,12 @@
                 
                 <div class="detail-grid">
                     <div class="detail-main">
+                        <div class="chart-container glass-panel" style="margin-bottom: 24px;">
+                            <h4>Activity Overview</h4>
+                            <div style="height: 200px;">
+                                <canvas id="releaseChart"></canvas>
+                            </div>
+                        </div>
                         <div class="table-wrapper glass-panel">
                             <h4>Release History & Downloads</h4>
                             <table class="nexus-table mini">

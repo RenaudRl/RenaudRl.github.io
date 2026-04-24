@@ -389,6 +389,10 @@ class GithubTracker {
 
         try {
             const releases = await this.apiFetch(`repos/${repo.full_name}/releases`);
+            
+            // Render Activity Chart
+            this.renderReleaseChart(releases);
+
             if (releaseBody) {
                 if (!releases || releases.length === 0) {
                     releaseBody.innerHTML = '<tr><td colspan="3" style="text-align: center">No releases found.</td></tr>';
@@ -406,8 +410,42 @@ class GithubTracker {
                 }
             }
         } catch (e) {
+            console.error('Modal data fetch failed:', e);
             if (releaseBody) releaseBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--accent-orange)">Failed to load releases.</td></tr>';
         }
+    }
+
+    renderReleaseChart(releases) {
+        const ctx = document.getElementById('releaseChart')?.getContext('2d');
+        if (!ctx) return;
+
+        if (this.charts.repoDetail) this.charts.repoDetail.destroy();
+
+        const data = [...releases].reverse().slice(-10); // Last 10 releases
+
+        this.charts.repoDetail = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(r => r.tag_name),
+                datasets: [{
+                    label: 'Downloads',
+                    data: data.map(r => r.assets.reduce((sum, a) => sum + a.download_count, 0)),
+                    backgroundColor: 'rgba(88, 166, 255, 0.5)',
+                    borderColor: '#58A6FF',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#8B949E', font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { color: '#8B949E', font: { size: 10 } } }
+                }
+            }
+        });
     }
 
     saveCache() {

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obsidian Nexus | GitHub Tracker</title>
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="A premium GitHub tracking dashboard with real-time statistics and visualization.">
+    <meta property="og:title" content="Obsidian Nexus | GitHub Tracker">
+    <meta property="og:description" content="Sleek, real-time GitHub repository tracking and visualization.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar / Navigation -->
+        <nav class="glass-nav">
+            <div class="logo">
+                <i class="fab fa-github nexus-icon"></i>
+                <span class="nexus-text">Nexus</span>
+            </div>
+            <div class="nav-actions">
+                <button id="refreshBtn" class="icon-btn" title="Refresh Data">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="settingsBtn" class="icon-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="user-profile" id="userProfile">
+                    <img src="https://github.com/identicons/j.png" alt="User Avatar" class="avatar-sm">
+                </div>
+            </div>
+        </nav>
+
+        <main class="content">
+            <!-- Hero / Global Stats -->
+            <section class="hero-section">
+                <div class="welcome-text">
+                    <h1 class="gradient-text">GitHub Overview</h1>
+                    <p class="subtitle text-muted">Tracking your digital footprint across the nexus.</p>
+                </div>
+                
+                <div class="global-stats-grid">
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon stars-bg"><i class="fas fa-star"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Stars</span>
+                            <h3 id="totalStars">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon repos-bg"><i class="fas fa-code-branch"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Repositories</span>
+                            <h3 id="totalRepos">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon followers-bg"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Followers</span>
+                            <h3 id="totalFollowers">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon downloads-bg"><i class="fas fa-download"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Downloads</span>
+                            <h3 id="totalDownloads">0</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Repository List Explorer -->
+            <section class="explorer-section">
+                <div class="section-header">
+                    <h2>Repositories</h2>
+                    <div class="filters">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="repoSearch" placeholder="Search repositories...">
+                        </div>
+                        <select id="sortSelect" class="nexus-select">
+                            <option value="stars">Most Stars</option>
+                            <option value="updated">Recently Updated</option>
+                            <option value="name">Name</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="repo-grid" id="repoGrid">
+                    <!-- Repo cards will be injected here -->
+                    <div class="skeleton-loader"></div>
+                    <div class="skeleton-loader"></div>
+                    <div class="skeleton-loader"></div>
+                </div>
+            </section>
+
+            <!-- About Section / Footer -->
+            <footer class="nexus-footer">
+                <div class="footer-content glass-panel">
+                    <div class="footer-info">
+                        <h4>About Obsidian Nexus</h4>
+                        <p>Nexus is a high-performance GitHub tracking dashboard designed to visualize repository impact, release distributions, and community engagement in real-time. Built for developers who need a centralized view of their digital ecosystem.</p>
+                    </div>
+                    <div class="footer-links">
+                        <a href="https://github.com/settings/tokens" target="_blank" class="text-link"><i class="fas fa-external-link-alt"></i> Get a GitHub PAT</a>
+                        <span class="version">v1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal glass-card animate-pop">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="ghUsername">GitHub Username</label>
+                    <input type="text" id="ghUsername" placeholder="e.g. ramiawar">
+                </div>
+                <div class="input-group">
+                    <label for="ghToken">Personal Access Token (Optional)</label>
+                    <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
+                    <p class="input-hint">Increases API rate limits from 60 to 5,000 requests/hour. Stored only in your browser.</p>
+                </div>
+                <button id="saveSettings" class="primary-btn">Save & Refresh</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="repoModal" class="modal-overlay hidden">
+        <div class="modal glass-card animate-pop wide-modal">
+            <div class="modal-header">
+                <h3 id="modalRepoName">Repo Details</h3>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body scrollable">
+                <div class="repo-detail-header">
+                    <p id="modalRepoDesc" class="text-muted"></p>
+                    <div class="repo-tags" id="modalRepoTags"></div>
+                </div>
+                
+                <div class="detail-grid">
+                    <div class="detail-main">
+                        <div class="chart-container glass-panel">
+                            <h4>Release Downloads History</h4>
+                            <canvas id="releaseChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="detail-side">
+                        <div class="info-panel glass-panel">
+                            <h4>Stats</h4>
+                            <ul class="stats-list" id="modalStatsList"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

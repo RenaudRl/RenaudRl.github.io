@@ -33,19 +33,10 @@ class GithubTracker {
             this.fetchData();
         }
 
-        // Hide modal explicitly if we have a username
-        if (this.username) {
-            this.hideModal('settingsModal');
-        }
-
-        document.getElementById('ghUsername').value = this.username;
-        document.getElementById('ghToken').value = this.token;
     }
 
     setupEventListeners() {
         document.getElementById('refreshBtn').addEventListener('click', () => this.fetchData());
-        document.getElementById('settingsBtn').addEventListener('click', () => this.showModal('settingsModal'));
-        document.getElementById('saveSettings').addEventListener('click', () => this.saveSettings());
         
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -121,6 +112,14 @@ class GithubTracker {
         }
 
         return await response.json();
+    }
+
+    updateUserUI(userData) {
+        this.globalStats.followers = userData.followers;
+        document.getElementById('totalFollowers').textContent = this.formatNumber(userData.followers);
+        
+        const profileDiv = document.getElementById('userProfile');
+        profileDiv.innerHTML = `<img src="${userData.avatar_url}" alt="${userData.login}" class="avatar-sm">`;
     }
 
     calculateGlobalStats() {
@@ -291,22 +290,6 @@ class GithubTracker {
             }
         }
         return false;
-    }
-
-    saveSettings() {
-        const username = document.getElementById('ghUsername').value.trim();
-        const token = document.getElementById('ghToken').value.trim();
-
-        if (!username) return;
-
-        localStorage.setItem('nexus_username', username);
-        localStorage.setItem('nexus_token', token);
-        
-        this.username = username;
-        this.token = token;
-        
-        this.hideModal('settingsModal');
-        this.fetchData();
     }
 
     handleSearch(query) {

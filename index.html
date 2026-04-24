@@ -34,9 +34,6 @@
                 <button id="refreshBtn" class="icon-btn" title="Refresh Data">
                     <i class="fas fa-sync-alt"></i>
                 </button>
-                <button id="settingsBtn" class="icon-btn" title="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
                 <div class="user-profile" id="userProfile">
                     <img src="https://github.com/identicons/j.png" alt="User Avatar" class="avatar-sm">
                 </div>
@@ -126,25 +123,6 @@
     </div>
 
     <!-- Modals -->
-    <div id="settingsModal" class="modal-overlay hidden">
-        <div class="modal glass-card animate-pop">
-            <div class="modal-header">
-                <h3>Settings</h3>
-                <button class="close-modal"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <div class="input-group">
-                    <label for="ghUsername">GitHub Username</label>
-                    <input type="text" id="ghUsername" placeholder="e.g. ramiawar">
-                </div>
-                <div class="input-group">
-                    <label for="ghToken">Personal Access Token (Optional)</label>
-                    <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
-                    <p class="input-hint">Increases API rate limits from 60 to 5,000 requests/hour. Stored only in your browser.</p>
-                </div>
-                <button id="saveSettings" class="primary-btn">Save & Refresh</button>
-            </div>
-        </div>
     </div>
 
     <div id="repoModal" class="modal-overlay hidden">

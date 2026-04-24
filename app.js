@@ -1,5 +1,5 @@
 /**
- * BTC Studio - GitHub Overview Logic v1.4.1
+ * BTC Studio - GitHub Overview Logic v1.0.1
  * Optimized for performance and stability.
  */
 
@@ -26,17 +26,34 @@ class GithubTracker {
 
         if (this.loadCache()) {
             this.renderUI();
-            if (Date.now() - this.lastUpdated > 3600000) {
-                this.fetchData();
-            }
         } else {
-            this.fetchData();
+            // No cache: propose sync on arrival
+            setTimeout(() => this.showModal('syncModal'), 800);
         }
     }
 
     setupEventListeners() {
         const refreshBtn = document.getElementById('refreshBtn');
-        if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchData());
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                const tokenInput = document.getElementById('ghTokenInput');
+                if (tokenInput) tokenInput.value = this.token || '';
+                this.showModal('syncModal');
+            });
+        }
+
+        const confirmSyncBtn = document.getElementById('confirmSyncBtn');
+        if (confirmSyncBtn) {
+            confirmSyncBtn.addEventListener('click', () => {
+                const tokenInput = document.getElementById('ghTokenInput');
+                if (tokenInput) {
+                    this.token = tokenInput.value.trim();
+                    localStorage.setItem('nexus_token', this.token);
+                }
+                this.hideModal('syncModal');
+                this.fetchData();
+            });
+        }
 
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {

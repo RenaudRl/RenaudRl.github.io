@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BTC Studio | GitHub Overview</title>
-    
-    <meta name="description" content="A premium GitHub tracking dashboard with real-time statistics and visualization.">
-    
+
+    <meta name="description" content="A GitHub tracking dashboard with real-time statistics and visualization.">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=1.4.1">
+    <link rel="stylesheet" href="style.css?v=1.0.0">
     <link rel="icon" href="fav.ico">
-    
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="dark-theme">
     <div class="app-container">
         <!-- Header Navigation -->
@@ -25,7 +29,7 @@
                 <i class="fas fa-cube nexus-icon"></i>
                 <span class="nexus-text">BTC Studio</span>
             </div>
-            
+
             <nav class="header-nav">
                 <ul class="nav-links">
                     <li class="nav-item active" data-tab="analytics">
@@ -55,16 +59,17 @@
 
         <!-- Main Content Area -->
         <main class="content-wrapper">
-            
+
             <!-- Analytics Tab -->
             <section id="analytics-tab" class="tab-content active">
                 <div class="hero-section">
                     <div class="welcome-text">
                         <h1 class="gradient-text">Repository Analytics</h1>
-                        <p class="subtitle text-muted">Comprehensive technical activity and impact metrics for BTC Studio.</p>
+                        <p class="subtitle text-muted">Comprehensive technical activity and impact metrics for BTC
+                            Studio.</p>
                         <p id="lastUpdated" class="last-updated-text"></p>
                     </div>
-                    
+
                     <div class="global-stats-grid">
                         <div class="stat-card glass-card">
                             <div class="stat-icon stars-bg"><i class="fas fa-star"></i></div>
@@ -109,7 +114,7 @@
                             <canvas id="starsDistributionChart"></canvas>
                         </div>
                     </div>
-                    
+
                     <div class="analytics-item glass-card">
                         <div class="card-header">
                             <h3><i class="fas fa-terminal"></i> Language Breakdown</h3>
@@ -174,7 +179,7 @@
                     </table>
                 </div>
             </section>
-            
+
             <footer class="nexus-footer">
                 <div class="footer-content">
                     <div class="footer-info">
@@ -182,7 +187,7 @@
                         <p>High-performance monitoring dashboard for TypeWriter infrastructures.</p>
                     </div>
                     <div class="footer-links">
-                        <span class="version">v1.4.2-PRO</span>
+                        <span class="version">v1.0.0-PRO</span>
                     </div>
                 </div>
             </footer>
@@ -201,7 +206,7 @@
                     <p id="modalRepoDesc" class="text-muted"></p>
                     <div class="repo-tags" id="modalRepoTags"></div>
                 </div>
-                
+
                 <div class="detail-grid">
                     <div class="detail-main">
                         <div class="chart-container glass-panel" style="margin-bottom: 24px;">
@@ -237,6 +242,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=1.4.1"></script>
+    <script src="app.js?v=1.0.0"></script>
 </body>
+
 </html>

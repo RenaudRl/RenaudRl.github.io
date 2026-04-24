@@ -23,7 +23,7 @@ class GithubTracker {
 
     init() {
         this.setupEventListeners();
-        
+
         if (this.loadCache()) {
             this.renderUI();
             if (Date.now() - this.lastUpdated > 3600000) {
@@ -37,7 +37,7 @@ class GithubTracker {
     setupEventListeners() {
         const refreshBtn = document.getElementById('refreshBtn');
         if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchData());
-        
+
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {
                 if (item.classList.contains('soon')) return;
@@ -55,7 +55,7 @@ class GithubTracker {
 
         const repoSearch = document.getElementById('repoSearch');
         if (repoSearch) repoSearch.addEventListener('input', (e) => this.handleSearch(e.target.value));
-        
+
         const sortSelect = document.getElementById('sortSelect');
         if (sortSelect) sortSelect.addEventListener('change', (e) => this.handleSort(e.target.value));
     }
@@ -78,7 +78,7 @@ class GithubTracker {
         try {
             console.log('Fetching fresh data from GitHub...');
             this.showLoading();
-            
+
             const userData = await this.apiFetch(`users/${this.username}`);
             this.updateUserUI(userData);
 
@@ -95,7 +95,7 @@ class GithubTracker {
             this.repos = allRepos;
             this.filteredRepos = [...this.repos];
             this.lastUpdated = Date.now();
-            
+
             await this.calculateGlobalStats();
             this.saveCache();
             this.renderUI();
@@ -111,7 +111,7 @@ class GithubTracker {
         if (this.token) headers['Authorization'] = `token ${this.token}`;
 
         const response = await fetch(`https://api.github.com/${endpoint}`, { headers });
-        
+
         if (response.status === 403) {
             const remaining = response.headers.get('X-RateLimit-Remaining');
             if (remaining === '0') throw new Error('Rate limit exceeded.');
@@ -126,7 +126,7 @@ class GithubTracker {
         this.globalStats.followers = userData.followers;
         const followersEl = document.getElementById('totalFollowers');
         if (followersEl) followersEl.textContent = this.formatNumber(userData.followers);
-        
+
         const profileDiv = document.getElementById('userProfile');
         if (profileDiv && userData.avatar_url) {
             profileDiv.innerHTML = `<img src="${userData.avatar_url}" alt="${userData.login}" class="avatar-sm">`;
@@ -147,11 +147,11 @@ class GithubTracker {
         const reposToFetch = targetRepos.slice(0, limit);
 
         try {
-            const promises = reposToFetch.map(repo => 
+            const promises = reposToFetch.map(repo =>
                 this.apiFetch(`repos/${repo.full_name}/releases`).catch(() => [])
             );
             const allReleases = await Promise.all(promises);
-            
+
             allReleases.forEach((releases, index) => {
                 const repo = reposToFetch[index];
                 let repoDls = 0;
@@ -188,7 +188,7 @@ class GithubTracker {
             const el = document.getElementById(id);
             if (el) el.textContent = this.formatNumber(val);
         }
-        
+
         if (this.lastUpdated) {
             const date = new Date(this.lastUpdated);
             const lastUpEl = document.getElementById('lastUpdated');
@@ -215,7 +215,7 @@ class GithubTracker {
         const data = [...this.repos]
             .sort((a, b) => b.stargazers_count - a.stargazers_count)
             .slice(0, 15);
-            
+
         this.charts.stars = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -316,9 +316,9 @@ class GithubTracker {
         const tableBody = document.getElementById('reposTableBody');
         const tableFooter = document.getElementById('reposTableFooter');
         if (!tableBody) return;
-        
+
         tableBody.innerHTML = '';
-        
+
         let totalStars = 0;
         let totalForks = 0;
         let totalIssues = 0;
@@ -373,10 +373,10 @@ class GithubTracker {
     async showRepoDetails(repo) {
         const nameEl = document.getElementById('modalRepoName');
         if (nameEl) nameEl.textContent = repo.name;
-        
+
         const descEl = document.getElementById('modalRepoDesc');
         if (descEl) descEl.textContent = repo.description || '';
-        
+
         const tagsDiv = document.getElementById('modalRepoTags');
         if (tagsDiv) tagsDiv.innerHTML = (repo.topics || []).map(t => `<span class="tag">${t}</span>`).join('');
 
@@ -475,8 +475,8 @@ class GithubTracker {
 
     handleSearch(query) {
         const q = query.toLowerCase();
-        this.filteredRepos = this.repos.filter(repo => 
-            repo.name.toLowerCase().includes(q) || 
+        this.filteredRepos = this.repos.filter(repo =>
+            repo.name.toLowerCase().includes(q) ||
             (repo.description && repo.description.toLowerCase().includes(q))
         );
         this.renderRepos();
@@ -494,11 +494,11 @@ class GithubTracker {
 
     showModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
     hideModal(id) { document.getElementById(id)?.classList.add('hidden'); }
-    showLoading() { 
+    showLoading() {
         const grid = document.getElementById('reposTableBody');
-        if (grid) grid.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="skeleton-loader"></div></td></tr>'; 
+        if (grid) grid.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;"><div class="skeleton-loader"></div></td></tr>';
     }
-    hideLoading() {}
+    hideLoading() { }
 
     formatNumber(num) {
         if (!num) return '0';

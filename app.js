@@ -1,5 +1,6 @@
 /**
  * BTC Studio - GitHub Overview Logic
+ * Optimized for performance and stability.
  */
 
 class GithubTracker {
@@ -23,10 +24,10 @@ class GithubTracker {
     init() {
         this.setupEventListeners();
         
-        // Try to load cached data first
+        // Load from cache first for instant feedback
         if (this.loadCache()) {
             this.renderUI();
-            // Refresh if cache > 1 hour
+            // Refresh if older than 1 hour
             if (Date.now() - this.lastUpdated > 3600000) {
                 this.fetchData();
             }
@@ -40,7 +41,7 @@ class GithubTracker {
         if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchData());
         
         document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
+            item.addEventListener('click', () => {
                 if (item.classList.contains('soon')) return;
                 const tabId = item.getAttribute('data-tab');
                 this.switchTab(tabId);
@@ -103,11 +104,6 @@ class GithubTracker {
             this.hideLoading();
         } catch (error) {
             console.error('Fetch error:', error);
-            if (this.repos.length > 0) {
-                alert(`Note: Using cached data because fresh fetch failed (${error.message})`);
-            } else {
-                alert(`Failed to fetch data: ${error.message}`);
-            }
             this.hideLoading();
         }
     }
@@ -120,7 +116,7 @@ class GithubTracker {
         
         if (response.status === 403) {
             const remaining = response.headers.get('X-RateLimit-Remaining');
-            if (remaining === '0') throw new Error('Rate limit exceeded. Please wait or use a PAT.');
+            if (remaining === '0') throw new Error('Rate limit exceeded.');
         }
         if (!response.ok) throw new Error(`GitHub API Error: ${response.status}`);
 
@@ -128,12 +124,13 @@ class GithubTracker {
     }
 
     updateUserUI(userData) {
+        if (!userData) return;
         this.globalStats.followers = userData.followers;
         const followersEl = document.getElementById('totalFollowers');
         if (followersEl) followersEl.textContent = this.formatNumber(userData.followers);
         
         const profileDiv = document.getElementById('userProfile');
-        if (profileDiv) {
+        if (profileDiv && userData.avatar_url) {
             profileDiv.innerHTML = `<img src="${userData.avatar_url}" alt="${userData.login}" class="avatar-sm">`;
         }
     }
@@ -157,28 +154,33 @@ class GithubTracker {
             );
             const allReleases = await Promise.all(promises);
             allReleases.forEach(releases => {
-                releases.forEach(release => {
-                    total += release.assets.reduce((sum, a) => sum + a.download_count, 0);
-                });
+                if (Array.isArray(releases)) {
+                    releases.forEach(release => {
+                        if (release.assets) {
+                            total += release.assets.reduce((sum, a) => sum + a.download_count, 0);
+                        }
+                    });
+                }
             });
             this.globalStats.downloads = total;
             const downloadsEl = document.getElementById('totalDownloads');
             if (downloadsEl) downloadsEl.textContent = this.formatNumber(total);
             this.saveCache();
         } catch (e) {
-            console.warn('Downloads sync failed');
+            console.warn('Downloads sync incomplete');
         }
     }
 
     renderUI() {
-        const elements = {
+        const stats = {
             'totalStars': this.globalStats.stars,
             'totalRepos': this.globalStats.repos,
             'totalFollowers': this.globalStats.followers,
-            'totalIssues': this.globalStats.issues
+            'totalIssues': this.globalStats.issues,
+            'totalDownloads': this.globalStats.downloads
         };
 
-        for (const [id, val] of Object.entries(elements)) {
+        for (const [id, val] of Object.entries(stats)) {
             const el = document.getElementById(id);
             if (el) el.textContent = this.formatNumber(val);
         }
@@ -186,7 +188,7 @@ class GithubTracker {
         if (this.lastUpdated) {
             const date = new Date(this.lastUpdated);
             const lastUpEl = document.getElementById('lastUpdated');
-            if (lastUpEl) lastUpEl.textContent = `Synced: ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
+            if (lastUpEl) lastUpEl.textContent = `Last synchronized: ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
         }
 
         this.renderAnalytics();
@@ -195,7 +197,6 @@ class GithubTracker {
 
     renderAnalytics() {
         if (!this.repos.length) return;
-        
         this.updateStarsDistributionChart();
         this.updateLanguageBreakdownChart();
         this.updateIssuesDensityChart();
@@ -320,7 +321,7 @@ class GithubTracker {
                     <span class="repo-name">${repo.name}</span>
                     <span class="repo-visibility badge">${repo.private ? 'Private' : 'Public'}</span>
                 </div>
-                <p class="repo-desc">${repo.description || 'No description'}</p>
+                <p class="repo-desc">${repo.description || 'No description provided'}</p>
                 <div class="repo-footer">
                     <div class="repo-stats">
                         <span><i class="fas fa-star"></i> ${repo.stargazers_count}</span>
@@ -339,12 +340,23 @@ class GithubTracker {
 
     async showRepoDetails(repo) {
         const nameEl = document.getElementById('modalRepoName');
-        const descEl = document.getElementById('modalRepoDesc');
         if (nameEl) nameEl.textContent = repo.name;
+        
+        const descEl = document.getElementById('modalRepoDesc');
         if (descEl) descEl.textContent = repo.description || '';
         
         const tagsDiv = document.getElementById('modalRepoTags');
         if (tagsDiv) tagsDiv.innerHTML = (repo.topics || []).map(t => `<span class="tag">${t}</span>`).join('');
+
+        const statsList = document.getElementById('modalStatsList');
+        if (statsList) {
+            statsList.innerHTML = `
+                <li><span>Stars</span> <strong>${repo.stargazers_count}</strong></li>
+                <li><span>Open Issues</span> <strong>${repo.open_issues_count}</strong></li>
+                <li><span>Language</span> <strong>${repo.language || 'Mixed'}</strong></li>
+                <li><span>Last Update</span> <strong>${new Date(repo.updated_at).toLocaleDateString()}</strong></li>
+            `;
+        }
 
         this.showModal('repoModal');
     }

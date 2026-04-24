@@ -5,28 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BTC Studio | GitHub Overview</title>
     
-    <!-- Meta Tags -->
     <meta name="description" content="A premium GitHub tracking dashboard with real-time statistics and visualization.">
-    <meta property="og:title" content="BTC Studio | GitHub Overview">
-    <meta property="og:description" content="Sleek, real-time GitHub repository tracking and visualization by BTC Studio.">
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Icons & Styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.2">
     <link rel="icon" href="fav.ico">
     
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="fav.ico">
-    
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dark-theme">
@@ -68,7 +56,7 @@
         <!-- Main Content Area -->
         <main class="content-wrapper">
             
-            <!-- Analytics Tab (Primary Focus) -->
+            <!-- Analytics Tab -->
             <section id="analytics-tab" class="tab-content active">
                 <div class="hero-section">
                     <div class="welcome-text">
@@ -106,6 +94,8 @@
                                 <h3 id="totalIssues">0</h3>
                             </div>
                         </div>
+                        <!-- Hidden stat to prevent JS errors if script expects it -->
+                        <div id="totalDownloads" style="display: none;">0</div>
                     </div>
                 </div>
 
@@ -142,7 +132,7 @@
                 </div>
             </section>
 
-            <!-- Repositories Tab (Secondary) -->
+            <!-- Repositories Tab -->
             <section id="repositories-tab" class="tab-content">
                 <div class="section-header">
                     <h2>Repository Explorer</h2>
@@ -159,31 +149,24 @@
                     </div>
                 </div>
 
-                <div class="repo-grid" id="repoGrid">
-                    <!-- Repo cards injected here -->
-                    <div class="skeleton-loader"></div>
-                    <div class="skeleton-loader"></div>
-                </div>
+                <div class="repo-grid" id="repoGrid"></div>
             </section>
             
             <footer class="nexus-footer">
                 <div class="footer-content">
                     <div class="footer-info">
                         <h4>BTC Studio Engineering</h4>
-                        <p>High-performance monitoring dashboard for TypeWriter infrastructures and extensions.</p>
+                        <p>High-performance monitoring dashboard for TypeWriter infrastructures.</p>
                     </div>
                     <div class="footer-links">
-                        <span class="version">v1.2.0-PRO</span>
+                        <span class="version">v1.2.1-PRO</span>
                     </div>
                 </div>
             </footer>
         </main>
     </div>
->
 
     <!-- Modals -->
-    </div>
-
     <div id="repoModal" class="modal-overlay hidden">
         <div class="modal glass-card animate-pop wide-modal">
             <div class="modal-header">
@@ -199,7 +182,7 @@
                 <div class="detail-grid">
                     <div class="detail-main">
                         <div class="chart-container glass-panel">
-                            <h4>Release Downloads History</h4>
+                            <h4>Activity Overview</h4>
                             <canvas id="releaseChart"></canvas>
                         </div>
                     </div>
@@ -214,6 +197,6 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=1.2"></script>
 </body>
 </html>

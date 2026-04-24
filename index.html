@@ -135,11 +135,11 @@
             <!-- Repositories Tab -->
             <section id="repositories-tab" class="tab-content">
                 <div class="section-header">
-                    <h2>Repository Explorer</h2>
+                    <h2>Repository Inventory</h2>
                     <div class="filters">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
-                            <input type="text" id="repoSearch" placeholder="Filter repositories...">
+                            <input type="text" id="repoSearch" placeholder="Filter inventory...">
                         </div>
                         <select id="sortSelect" class="nexus-select">
                             <option value="stars">Most Stars</option>
@@ -149,7 +149,26 @@
                     </div>
                 </div>
 
-                <div class="repo-grid" id="repoGrid"></div>
+                <div class="table-wrapper glass-card">
+                    <table class="nexus-table" id="reposTable">
+                        <thead>
+                            <tr>
+                                <th>Repository</th>
+                                <th>Language</th>
+                                <th>Stars</th>
+                                <th>Forks</th>
+                                <th>Issues</th>
+                                <th>Last Sync</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reposTableBody">
+                            <!-- Table rows injected here -->
+                        </tbody>
+                        <tfoot id="reposTableFooter">
+                            <!-- Totals injected here -->
+                        </tfoot>
+                    </table>
+                </div>
             </section>
             
             <footer class="nexus-footer">
@@ -159,7 +178,7 @@
                         <p>High-performance monitoring dashboard for TypeWriter infrastructures.</p>
                     </div>
                     <div class="footer-links">
-                        <span class="version">v1.2.1-PRO</span>
+                        <span class="version">v1.3.0-PRO</span>
                     </div>
                 </div>
             </footer>
@@ -181,14 +200,25 @@
                 
                 <div class="detail-grid">
                     <div class="detail-main">
-                        <div class="chart-container glass-panel">
-                            <h4>Activity Overview</h4>
-                            <canvas id="releaseChart"></canvas>
+                        <div class="table-wrapper glass-panel">
+                            <h4>Release History & Downloads</h4>
+                            <table class="nexus-table mini">
+                                <thead>
+                                    <tr>
+                                        <th>Version</th>
+                                        <th>Date</th>
+                                        <th>Downloads</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalReleaseTableBody">
+                                    <!-- Releases injected here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <div class="detail-side">
                         <div class="info-panel glass-panel">
-                            <h4>Stats</h4>
+                            <h4>General Statistics</h4>
                             <ul class="stats-list" id="modalStatsList"></ul>
                         </div>
                     </div>

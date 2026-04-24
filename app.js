@@ -1,5 +1,5 @@
 /**
- * BTC Studio - GitHub Overview Logic
+ * BTC Studio - GitHub Overview Logic v1.3.0
  * Optimized for performance and stability.
  */
 
@@ -309,33 +309,56 @@ class GithubTracker {
     }
 
     renderRepos() {
-        const grid = document.getElementById('repoGrid');
-        if (!grid) return;
-        grid.innerHTML = '';
+        const tableBody = document.getElementById('reposTableBody');
+        const tableFooter = document.getElementById('reposTableFooter');
+        if (!tableBody) return;
+        
+        tableBody.innerHTML = '';
+        
+        let totalStars = 0;
+        let totalForks = 0;
+        let totalIssues = 0;
 
         this.filteredRepos.forEach(repo => {
-            const card = document.createElement('div');
-            card.className = 'repo-card glass-card animate-pop';
-            card.innerHTML = `
-                <div class="repo-header">
-                    <span class="repo-name">${repo.name}</span>
-                    <span class="repo-visibility badge">${repo.private ? 'Private' : 'Public'}</span>
-                </div>
-                <p class="repo-desc">${repo.description || 'No description provided'}</p>
-                <div class="repo-footer">
-                    <div class="repo-stats">
-                        <span><i class="fas fa-star"></i> ${repo.stargazers_count}</span>
-                        <span><i class="fas fa-bug"></i> ${repo.open_issues_count}</span>
-                    </div>
+            totalStars += repo.stargazers_count;
+            totalForks += repo.forks_count;
+            totalIssues += repo.open_issues_count;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <div class="table-repo-name">${repo.name}</div>
+                    <div class="text-muted" style="font-size: 0.75rem">${repo.description || 'No description'}</div>
+                </td>
+                <td>
                     <div class="lang-badge">
                         <span class="lang-dot" style="background-color: ${this.getLangColor(repo.language)}"></span>
                         <span>${repo.language || 'Mixed'}</span>
                     </div>
-                </div>
+                </td>
+                <td class="table-stat-cell">${repo.stargazers_count}</td>
+                <td class="table-stat-cell">${repo.forks_count}</td>
+                <td class="table-stat-cell">${repo.open_issues_count}</td>
+                <td>
+                    <div class="table-sync-date">${new Date(repo.updated_at).toLocaleDateString()}</div>
+                </td>
             `;
-            card.onclick = () => this.showRepoDetails(repo);
-            grid.appendChild(card);
+            row.onclick = () => this.showRepoDetails(repo);
+            tableBody.appendChild(row);
         });
+
+        if (tableFooter) {
+            tableFooter.innerHTML = `
+                <tr>
+                    <td>TOTAL (${this.filteredRepos.length} Repos)</td>
+                    <td>-</td>
+                    <td>${totalStars}</td>
+                    <td>${totalForks}</td>
+                    <td>${totalIssues}</td>
+                    <td>-</td>
+                </tr>
+            `;
+        }
     }
 
     async showRepoDetails(repo) {
@@ -352,13 +375,39 @@ class GithubTracker {
         if (statsList) {
             statsList.innerHTML = `
                 <li><span>Stars</span> <strong>${repo.stargazers_count}</strong></li>
+                <li><span>Forks</span> <strong>${repo.forks_count}</strong></li>
                 <li><span>Open Issues</span> <strong>${repo.open_issues_count}</strong></li>
                 <li><span>Language</span> <strong>${repo.language || 'Mixed'}</strong></li>
                 <li><span>Last Update</span> <strong>${new Date(repo.updated_at).toLocaleDateString()}</strong></li>
             `;
         }
 
+        const releaseBody = document.getElementById('modalReleaseTableBody');
+        if (releaseBody) releaseBody.innerHTML = '<tr><td colspan="3" style="text-align: center">Loading releases...</td></tr>';
+
         this.showModal('repoModal');
+
+        try {
+            const releases = await this.apiFetch(`repos/${repo.full_name}/releases`);
+            if (releaseBody) {
+                if (!releases || releases.length === 0) {
+                    releaseBody.innerHTML = '<tr><td colspan="3" style="text-align: center">No releases found.</td></tr>';
+                } else {
+                    releaseBody.innerHTML = releases.map(r => {
+                        const dls = r.assets.reduce((sum, a) => sum + a.download_count, 0);
+                        return `
+                            <tr>
+                                <td><span class="badge" style="background: rgba(88, 166, 255, 0.1); color: var(--accent-blue)">${r.tag_name}</span></td>
+                                <td>${new Date(r.published_at).toLocaleDateString()}</td>
+                                <td><strong>${this.formatNumber(dls)}</strong></td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
+        } catch (e) {
+            if (releaseBody) releaseBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--accent-orange)">Failed to load releases.</td></tr>';
+        }
     }
 
     saveCache() {

@@ -344,6 +344,21 @@ h1, h2, h3, h4, .nexus-text {
     width: 100%;
 }
 
+.scrollable-y {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.scrollable-y::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollable-y::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
 .nexus-table {
     width: 100%;
     border-collapse: collapse;

@@ -153,19 +153,24 @@ class GithubTracker {
                 this.apiFetch(`repos/${repo.full_name}/releases`).catch(() => [])
             );
             const allReleases = await Promise.all(promises);
-            allReleases.forEach(releases => {
+            allReleases.forEach((releases, index) => {
+                const repo = reposToFetch[index];
+                let repoDls = 0;
                 if (Array.isArray(releases)) {
                     releases.forEach(release => {
                         if (release.assets) {
-                            total += release.assets.reduce((sum, a) => sum + a.download_count, 0);
+                            repoDls += release.assets.reduce((sum, a) => sum + a.download_count, 0);
                         }
                     });
                 }
+                repo.total_downloads = repoDls;
+                total += repoDls;
             });
             this.globalStats.downloads = total;
             const downloadsEl = document.getElementById('totalDownloads');
             if (downloadsEl) downloadsEl.textContent = this.formatNumber(total);
             this.saveCache();
+            this.renderRepos(); // Update table with new downloads data
         } catch (e) {
             console.warn('Downloads sync incomplete');
         }
@@ -318,11 +323,13 @@ class GithubTracker {
         let totalStars = 0;
         let totalForks = 0;
         let totalIssues = 0;
+        let totalDownloads = 0;
 
         this.filteredRepos.forEach(repo => {
             totalStars += repo.stargazers_count;
             totalForks += repo.forks_count;
             totalIssues += repo.open_issues_count;
+            totalDownloads += (repo.total_downloads || 0);
 
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -339,6 +346,7 @@ class GithubTracker {
                 <td class="table-stat-cell">${repo.stargazers_count}</td>
                 <td class="table-stat-cell">${repo.forks_count}</td>
                 <td class="table-stat-cell">${repo.open_issues_count}</td>
+                <td class="table-stat-cell"><strong>${this.formatNumber(repo.total_downloads || 0)}</strong></td>
                 <td>
                     <div class="table-sync-date">${new Date(repo.updated_at).toLocaleDateString()}</div>
                 </td>
@@ -355,6 +363,7 @@ class GithubTracker {
                     <td>${totalStars}</td>
                     <td>${totalForks}</td>
                     <td>${totalIssues}</td>
+                    <td>${this.formatNumber(totalDownloads)}</td>
                     <td>-</td>
                 </tr>
             `;

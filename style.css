@@ -57,8 +57,9 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('https://grainy-gradients.vercel.app/noise.svg');
-    opacity: 0.03;
+    background: radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.5;
     pointer-events: none;
     z-index: 9999;
 }

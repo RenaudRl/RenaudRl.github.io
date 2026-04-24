@@ -16,7 +16,6 @@ class GithubTracker {
         };
         this.chart = null;
         this.lastUpdated = null;
-
         this.init();
     }
 
@@ -32,6 +31,11 @@ class GithubTracker {
             }
         } else {
             this.fetchData();
+        }
+
+        // Hide modal explicitly if we have a username
+        if (this.username) {
+            this.hideModal('settingsModal');
         }
 
         document.getElementById('ghUsername').value = this.username;

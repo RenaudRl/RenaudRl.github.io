@@ -38,6 +38,14 @@ class GithubTracker {
     setupEventListeners() {
         document.getElementById('refreshBtn').addEventListener('click', () => this.fetchData());
         
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (item.classList.contains('soon')) return;
+                const tabId = item.getAttribute('data-tab');
+                this.switchTab(tabId);
+            });
+        });
+
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const modal = e.target.closest('.modal-overlay');
@@ -47,6 +55,18 @@ class GithubTracker {
 
         document.getElementById('repoSearch').addEventListener('input', (e) => this.handleSearch(e.target.value));
         document.getElementById('sortSelect').addEventListener('change', (e) => this.handleSort(e.target.value));
+    }
+
+    switchTab(tabId) {
+        // Update Sidebar UI
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.toggle('active', item.getAttribute('data-tab') === tabId);
+        });
+
+        // Update Content UI
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.toggle('active', content.id === `${tabId}-tab`);
+        });
     }
 
     async fetchData() {
@@ -116,10 +136,13 @@ class GithubTracker {
 
     updateUserUI(userData) {
         this.globalStats.followers = userData.followers;
-        document.getElementById('totalFollowers').textContent = this.formatNumber(userData.followers);
+        const followersEl = document.getElementById('totalFollowers');
+        if (followersEl) followersEl.textContent = this.formatNumber(userData.followers);
         
         const profileDiv = document.getElementById('userProfile');
-        profileDiv.innerHTML = `<img src="${userData.avatar_url}" alt="${userData.login}" class="avatar-sm">`;
+        if (profileDiv) {
+            profileDiv.innerHTML = `<img src="${userData.avatar_url}" alt="${userData.login}" class="avatar-sm">`;
+        }
     }
 
     calculateGlobalStats() {
